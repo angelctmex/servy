@@ -20,11 +20,19 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    if conv.path == "/wildthings" do
-      %{conv | resp_body: "Bears, Lions, Tigers"}
-    else
-      %{conv | resp_body: "Teddy, Smokey, Paddington"}
-    end
+    route(conv, conv.method, conv.path)
+  end
+
+  def route(conv, "GET", "/wildthings") do
+    %{conv | resp_body: "Bears, Lion, Tigers"}
+  end
+
+  def route(conv, "GET", "/bears") do
+     %{conv | resp_body: "Teddy, Smokey, Paddington"}
+  end
+
+  def route(conv, _, path) do
+    %{conv | resp_body: "No #{path} is here !!!"}
   end
 
   def format_response(conv) do
@@ -46,9 +54,7 @@ Accept: */*
 
 Bears, Lion, Tigers
 """
-
 response = Servy.Handler.handle(request)
-
 IO.puts response
 
 request = """
@@ -59,7 +65,16 @@ Accept: */*
 
 Bears, Lion, Tigers
 """
-
 response = Servy.Handler.handle(request)
+IO.puts response
 
+request = """
+GET /bigfoot HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+Bears, Lion, Tigers
+"""
+response = Servy.Handler.handle(request)
 IO.puts response
