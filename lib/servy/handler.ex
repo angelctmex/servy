@@ -22,12 +22,18 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{ method: "GET", path: "/bears"} = conv) do
-     %{conv | status: 200, resp_body: "Teddy, Smokey, Paddington"}
+    %{conv | status: 200, resp_body: "Teddy, Smokey, Paddington"}
   end
 
   def route(%Conv{ method: "GET", path: "/bears/" <> id} = conv) do
      %{conv | status: 200, resp_body: "Bear #{id}"}
   end
+
+  def route(%Conv{ method: "POST", path: "/bears"} = conv) do
+    %{conv | status: 200,
+             resp_body: "Create a #{conv.params["type"]} bear names #{conv.params["name"]} "}
+  end
+
 
   def route(%Conv{ method: "GET", path: "/about"} = conv) do
    file =
@@ -113,6 +119,22 @@ GET /about HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+
+Bears, Lion, Tigers
+"""
+response = Servy.Handler.handle(request)
+IO.puts response
+
+
+request = """
+POST /bears HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 21
+
+name=Baloo&type=Brown
 """
 response = Servy.Handler.handle(request)
 IO.puts response
