@@ -26,6 +26,10 @@ defmodule Servy.Handler do
     BearController.index(conv)
   end
 
+  def route(%Conv{ method: "GET", path: "/api/bears"} = conv) do
+    Servy.Api.BearController.index(conv)
+  end
+
   def route(%Conv{ method: "GET", path: "/bears/" <> id} = conv) do
     params = Map.put(conv.params, "id", id)
     BearController.show(conv, params)
@@ -45,7 +49,7 @@ defmodule Servy.Handler do
   end
 
   def route(%{path: path} = conv) do
-    %{conv | status: 404, resp_body: "No #{path} is here !!!"}
+    %{conv | status: 404, resp_body: "No #{path} here!"}
   end
 
   def handle_file({:ok, content}, conv) do
@@ -63,7 +67,7 @@ defmodule Servy.Handler do
   def format_response(%Conv{} = conv) do
     """
     HTTP/1.1 #{Conv.full_status(conv)}\r
-    Content-Type: text/html\r
+    Content-Type: #{conv.resp_content_type}\r
     Content-Length: #{String.length(conv.resp_body)}\r
     \r
     #{conv.resp_body}
